@@ -1,0 +1,103 @@
+@import url(https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;800;900&display=swap);
+
+body {
+  font-family: "Montserrat", sans-serif;
+}
+
+.page {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display:flex;
+}
+
+.form {
+  width: 100%;
+  max-width: 480px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border-radius: 16px;
+  gap: 24px;
+  background-color: #fff;
+  box-shadow: 0px 0px 12px 5px rgba(0, 0, 0, 0.2);
+}
+.form__heading {
+    /* clamp - резиновый шрифт, от 16 до 24 */
+    font-size: clamp(16px, 2vw, 24px);   
+    color: #131213;
+    margin-bottom: 16px;
+}
+
+.form__fieldset {
+    padding: 0;
+    border: none;
+}
+
+.form__input {
+    width: 320px;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 1px solid #2525252c;
+    transition: .3s;
+}
+
+
+.form__input:focus {
+    outline: none;
+    border-bottom: 1px solid #131213;
+}
+
+.form__btn {
+    padding: 8px 16px;
+    color: #131213;
+    font-size: clamp(12px, 1.5vw, 16px);
+    border: 1px solid #1312134f;
+    border-radius: 12px;
+    
+}
+
+
+.page-content {
+    width: 100%;
+    margin:auto;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    gap: 16px;
+}
+
+
+.table {
+    width: 100%;
+    max-width: 600px;
+}
+
+.table-head, .table-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-content: start;
+    border-bottom: 1px solid #13121348;
+}
+
+.table-cell {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    font-size: clamp(14px, 1.5vw, 16px);
+    color: #131213;
+}
+.table-cell:first-child {
+    border-right: 1px solid #13121348;
+}
+
+
