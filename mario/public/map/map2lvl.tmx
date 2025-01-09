@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="29">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="33">
  <editorsettings>
   <export target="map2lvl.json" format="json"/>
  </editorsettings>
@@ -218,12 +218,12 @@
   <properties>
    <property name="collision" type="bool" value="true"/>
   </properties>
-  <object id="4" x="-1.42109e-14" y="225.068" width="252.231" height="62.0877">
+  <object id="4" x="-1.42109e-14" y="225.068" width="249.96" height="62.0877">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="11" x="65.1936" y="353.533" width="445.417" height="60.8182">
+  <object id="11" x="65.1936" y="353.533" width="442.163" height="60.8182">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
@@ -233,22 +233,22 @@
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="14" x="544.775" y="353.392" width="605.797" height="61.2893">
+  <object id="14" x="547.564" y="353.392" width="598.125" height="61.2893">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="15" x="1184.73" y="353.736" width="414.883" height="60.8414">
+  <object id="15" x="1188.92" y="353.736" width="410.698" height="60.8414">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="16" x="1376.65" y="193.638" width="61.8463" height="93.5395">
+  <object id="16" x="1378.82" y="193.638" width="57.0737" height="93.5395">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="17" x="1472.66" y="193.283" width="126.484" height="93.0851">
+  <object id="17" x="1475.7" y="193.283" width="123.447" height="93.0851">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
@@ -258,42 +258,42 @@
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="19" x="193.082" y="513.612" width="157.669" height="61.1228">
+  <object id="19" x="194.66" y="513.612" width="156.091" height="61.1228">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="20" x="350.182" y="512.478" width="1024.48" height="31.3259">
+  <object id="20" x="350.182" y="512.478" width="1020.77" height="31.3259">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="21" x="1312.34" y="544.178" width="62.6247" height="31.5649">
+  <object id="21" x="1312.34" y="544.178" width="58.9126" height="31.5649">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="22" x="1408.8" y="512.613" width="190.904" height="62.3722">
+  <object id="22" x="1411.45" y="512.613" width="188.252" height="62.3722">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="23" x="1216.83" y="641.444" width="382.35" height="30.3134">
+  <object id="23" x="1219.92" y="641.444" width="379.262" height="30.3134">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="24" x="896.706" y="640.735" width="285.742" height="30.7423">
+  <object id="24" x="899.202" y="640.735" width="280.673" height="30.7423">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="25" x="351.764" y="640.7" width="478.798" height="31.2174">
+  <object id="25" x="353.584" y="640.7" width="473.65" height="31.2174">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="26" x="0.226559" y="704.907" width="319.024" height="94.5549">
+  <object id="26" x="0.226559" y="704.907" width="317.185" height="94.5549">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
@@ -304,6 +304,26 @@
    </properties>
   </object>
   <object id="28" x="928.287" y="768.752" width="670.85" height="30.7056">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="29" x="-49.5586" y="-4.64612" width="48.0099" height="816.168">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="30" x="-48.5791" y="797.848" width="1654.12" height="40.1407">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="31" x="1598.83" y="-2.56225" width="50.3766" height="838.364">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="32" x="-52.3713" y="-30.065" width="1670.06" height="32.9745">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>

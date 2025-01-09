@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="38">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="50" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="42">
  <editorsettings>
   <export target="map1.json" format="json"/>
  </editorsettings>
@@ -62,22 +62,22 @@
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="4" x="160.214" y="353.163" width="159.585" height="29.9024">
+  <object id="4" x="160.214" y="353.163" width="157.912" height="29.9024">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="5" x="0.298125" y="544.376" width="159.795" height="31.3031">
+  <object id="5" x="0.298125" y="544.376" width="156.903" height="31.3031">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="6" x="224.547" y="544.705" width="158.986" height="30.8684">
+  <object id="6" x="226.354" y="546.1" width="157.179" height="29.4739">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="7" x="384.592" y="351.731" width="254.366" height="31.6436">
+  <object id="7" x="386.265" y="351.731" width="252.693" height="31.6436">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
@@ -214,6 +214,26 @@
    </properties>
   </object>
   <object id="35" x="0.268767" y="672.723" width="702.995" height="127.127">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="38" x="-35.1124" y="5.32907e-15" width="35.1124" height="799.391">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="39" x="-18.7266" y="794.18" width="1629.21" height="41.4942">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="40" x="1600.38" y="-2.15342" width="100.386" height="834.125">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="41" x="-42.2945" y="-72.6561" width="1667.28" height="74.0534">
    <properties>
     <property name="collision" type="bool" value="true"/>
    </properties>
