@@ -11,6 +11,7 @@ body {
   left: 0;
   top: 0;
   display:flex;
+  background-image: url(../images/backgorundimages.png);  
 }
 
 .form {
@@ -77,6 +78,9 @@ body {
 .table {
     width: 100%;
     max-width: 600px;
+    border-right: 1px solid #13121348;
+    background-color: white;
+    
 }
 
 .table-head, .table-row {
@@ -85,6 +89,7 @@ body {
     grid-template-columns: repeat(3, 1fr);
     justify-content: start;
     border-bottom: 1px solid #13121348;
+    border-top: 1px solid #13121348;
 }
 
 .table-cell {
@@ -98,6 +103,12 @@ body {
 }
 .table-cell:first-child {
     border-right: 1px solid #13121348;
+    border-left: 1px solid #13121348;
 }
+
+.table-cell:last-child {
+    border-left: 1px solid #13121348;
+}
+
 
 
