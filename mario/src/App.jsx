@@ -4,7 +4,7 @@ import MapRenderer from "./components/MapRenderer/MapRenderer.jsx";
 function App() {
   return (
     <>
-      <MapRenderer mapFile={"/map/map3lvl.json"} />
+      <MapRenderer mapFile={"/map/map1.json"} />
     </>
   );
 }

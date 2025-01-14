@@ -1,187 +1,202 @@
 import React, { useState, useEffect } from "react";
-
-// Текстуры (спрайты) перса
 import idleAnimationGif from "/map/Goblin.gif";
 
-const Mario = ({ mapData, tileSize, collisionData, initialPosition }) => {
-
+const Mario = ({
+  tileSize,
+  collisionData,
+  initialPosition,
+  ladderData,
+  mapData,
+  setLives,
+  lives,
+  setGameOver,
+  finish,
+}) => {
   const [position, setPosition] = useState(initialPosition);
-  const [isJumping, setIsJumping] = useState(false); // Состояние прыжка
-  const [velocity, setVelocity] = useState(0); // Скорость по оси Y
+  const [isJumping, setIsJumping] = useState(false);
+  const [velocity, setVelocity] = useState(0);
+  const [keysPressed, setKeysPressed] = useState(new Set());
 
-  //Здесь храним все нажатые клавиши в данный момент
-  const [keysPressed, setKeysPressed] = useState({});
-
-  // МОжно редактировать
-  const gravity = 2; // Сила гравитации
-  const jumpStrength = 20; // Сила прыжка
+  const gravity = 1.9; // Гравитация
+  const jumpStrength = 14; // Сила прыжка
   const speed = 16; // Скорость движения
-  
+  const ladderSpeed = 6; // Скорость движения по лестнице
 
-  // Проверка на столкновение
-  const checkCollision = (x, y) => {
-    //Проеверяем, пересекается ли перрсонаж хотя бы по одной из осей с коллизие
-    return collisionData.some((obj) => {
-      //Получаем координаты координаты  начала колллизии
-      const objX = obj.x;
-      const objY = obj.y;
-      
-      // Размеры плитки колизииии
-      const objWidth = obj.width;
-      const objHeight = obj.height;
-
-      return (
-        x < objX + objWidth && //Если координаты нашего персонажа хоть где то начинают пересекаться - вернем false, если
-        //вернет true -  то идти можно
-        x + tileSize > objX &&
-        y < objY + objHeight &&
-        y + tileSize > objY
-      );
-    });
+  const checkIfPlayerReachedFinish = () => {
+    console.log(position.x, position.y);
+    if (position.x >= finish.x && position.y >= finish.y) {
+      setGameOver(true); // Игрок достиг финиша
+      alert("Congratulations, you reached the finish!"); // Сообщение о победе
+    }
   };
 
-  // const handleKeyDown = (e) => {
-  //   let newX = position.x;
-  //   let newY = position.y;
+  const handleCollisionWithDamageLayer = () => {
+    const damageLayerId = 122; // ID плитки повреждения
 
-  //   if (e.key === "a") newX -= speed;
-  //   if (e.key === "d") newX += speed;
+    // Находим слой с повреждением в mapData.layers
+    const damageLayer = mapData.layers.find((layer) => layer.name === "damage");
 
-  //   console.log(newX, position);
+    // Если слой найден, проверяем попадание
+    if (damageLayer) {
+      // Получаем индекс плитки на основе позиции персонажа
+      const xIndex = Math.floor(position.x / tileSize);
+      const yIndex = Math.floor(position.y / tileSize);
+      const index = yIndex * damageLayer.width + xIndex;
 
-  //   // Прыжок, если не в прыжке
-  //   if (e.key === "w" && !isJumping) {
-  //     setIsJumping(true); //Флаг, о том, что мы прыгнули
-  //     setVelocity(-jumpStrength);
-  //   }
+      // Проверяем, есть ли повреждение в этой клетке
+      const isOnDamageLayer = damageLayer.data[index] === damageLayerId;
 
-  //   // Проверяем коллизии перед обновлением позиции по горизонтали
-  //   if (!checkCollision(newX, position.y)) {
-  //     setPosition((prev) => ({ ...prev, x: newX }));
-  //   }
-  // };
+      if (isOnDamageLayer && lives > 0) {
+        setLives(lives - 1); // Уменьшаем жизнь
+      }
+    }
+  };
 
-  //При нажатии клавиши отрабатывает
-  //Записываем все предыдущие и новую клавишу с булевым значением true (она нажата)
-  const handleKeyDown =(e) => {
-    setKeysPressed(prev => ({...prev, [e.key]: true}))
+  // Проверка нахождения на лестнице
+  const isOnLadder = (x, y) =>
+    ladderData.some(
+      (ladder) =>
+        x + tileSize > ladder.x &&
+        x < ladder.x + ladder.width &&
+        y + tileSize > ladder.y &&
+        y < ladder.y + ladder.height
+    );
 
+  // Проверка столкновений
+  const checkCollision = (x, y) =>
+    collisionData.some(
+      (obj) =>
+        x < obj.x + obj.width &&
+        x + tileSize > obj.x &&
+        y < obj.y + obj.height &&
+        y + tileSize > obj.y
+    );
 
+  // Обработчик нажатия клавиш
+  const handleKeyDown = (e) => {
+    setKeysPressed((prev) => new Set(prev).add(e.key));
 
-    if (e.key === "w" && !isJumping) {
+    // Прыжок
+    if ((e.key === " " || e.key === "w") && !isJumping) {
       setIsJumping(true);
       setVelocity(-jumpStrength);
     }
-    
+  };
 
-
-
-// прыжок под вопросом
-  }
-  //Отпускание клавиши
+  // Обработчик отпускания клавиш
   const handleKeyUp = (e) => {
-    setKeysPressed(prev => {
-      const newKeys = {...prev}; //получаем все старые клавиши
-      delete newKeys[e.key] //Удалить, ту клавишу которую мы отпустили
+    setKeysPressed((prev) => {
+      const updated = new Set(prev);
+      updated.delete(e.key);
+      return updated;
+    });
+  };
 
-      console.log(newKeys)
-      return newKeys; //Возвращаем новый объект клавиш
-    })
-  }
+  // Движение персонажа
+  const handleMovement = () => {
+    let newX = position.x;
+    let newY = position.y;
 
+    // Движение влево и вправо
+    if (keysPressed.has("a")) newX -= speed;
+    if (keysPressed.has("d")) newX += speed;
 
-
-  useEffect(() => {
-    
-    const handleMovement = () => {
-      let newX = position.x;
-      let newY = position.y;
-
-      if (keysPressed['a']) newX -= speed;
-      if (keysPressed['d']) newX += speed;
-
-
-      if (!checkCollision(newX, newY)) {
-        setPosition(prev => ({...prev, x: newX}))
-      }
-
+    // Движение по лестнице
+    if (isOnLadder(position.x, position.y)) {
+      if (keysPressed.has("w")) newY -= ladderSpeed; // Подъем
+      if (keysPressed.has("s")) newY += ladderSpeed; // Спуск
+    } else {
+      // Если не на лестнице, применять гравитацию
+      newY += velocity;
     }
 
-    const interval = setInterval(handleMovement, 30);
-  
-    return () => {
-      clearInterval(interval);
-    }
-  }, [position, keysPressed])
-  
+    // Проверка выхода с лестницы
+    if (!isOnLadder(newX, newY)) {
+      // Убедиться, что персонаж стоит на платформе
+      const platformBelow = collisionData.find(
+        (obj) =>
+          newX + tileSize > obj.x &&
+          newX < obj.x + obj.width &&
+          newY + tileSize <= obj.y &&
+          newY + tileSize + gravity > obj.y
+      );
 
-
-
-  useEffect(() => {
-    //Функция запуска работы гравитации в игре
-    //Работа: срабатывает при прыжке, работает до того момента, пока не найдется первый попавшийся слой коллизии
-    //по оси Y.
-    const handleGravity = () => {
-      let newY = position.y;
-      let newVelocity = velocity + gravity; // Увеличиваем скорость под воздействием гравитации
-      //К нашей координате добавили новую координату(при прыжке)
-      newY += newVelocity;
-
-
-      // Проверяем столкновение с землей
-      if (checkCollision(position.x, newY)) {
+      if (platformBelow) {
+        newY = platformBelow.y - tileSize; // Установить персонажа на платформу
         setIsJumping(false);
-        newVelocity = 0;
-
-        // Останавливаем персонажа на земле
-        const groundY = collisionData.find(
-          (obj) =>
-            position.x + tileSize > obj.x &&
-            position.x < obj.x + obj.width &&
-            position.y + tileSize <= obj.y &&
-            newY + tileSize > obj.y
-        )?.y;
-
-        if (groundY !== undefined) {
-          newY = groundY - tileSize;
-        }
       }
 
-      setVelocity(newVelocity);
-      setPosition((prev) => ({ ...prev, y: newY })); //Устанавливаем позицию персонажа
-    };
-
-    const interval = setInterval(handleGravity, 30);
-    return () => clearInterval(interval);
-  }, [position.y, position.x, velocity]);
-
-
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
+      checkIfPlayerReachedFinish();
     }
-  }, [keysPressed])
-  
 
+    // Проверка на столкновения
+    if (!checkCollision(newX, newY)) {
+      setPosition({ x: newX, y: newY });
+    }
+  };
 
+  // Гравитация и прыжки
+  const handleGravity = () => {
+    let newY = position.y;
+    let newVelocity = velocity + gravity;
 
+    // Если не на лестнице, то применяется гравитация
+    if (isOnLadder(position.x, position.y)) {
+      if (keysPressed.has("w")) newY -= ladderSpeed; // Подъем по лестнице
+      if (keysPressed.has("s")) newY += ladderSpeed; // Спуск по лестнице
+      setVelocity(0); // Отключить гравитацию
+    } else {
+      newY += velocity; // Применить гравитацию, если не на лестнице
+    }
 
+    // Проверка столкновений с землей
+    if (checkCollision(position.x, newY)) {
+      setIsJumping(false);
+      newVelocity = 0;
 
+      // Найти ближайший пол
+      const groundY = collisionData.find(
+        (obj) =>
+          position.x + tileSize > obj.x &&
+          position.x < obj.x + obj.width &&
+          position.y + tileSize <= obj.y &&
+          newY + tileSize > obj.y
+      )?.y;
 
+      if (groundY !== undefined) {
+        newY = groundY - tileSize;
+      }
+    }
 
+    setVelocity(newVelocity);
+    setPosition((prev) => ({ ...prev, y: newY }));
+  };
 
-  // ----------------------------------------------------
-  // useEffect(() => {
-  //   window.addEventListener("keydown", handleKeyDown);
-  //   return () => {
-  //     window.removeEventListener("keydown", handleKeyDown);
-  //   };
-  // }, [position, isJumping]);
+  // Таймеры для движения и гравитации
+  // Таймер для обновления движения и гравитации
+  useEffect(() => {
+    const gameLoop = setInterval(() => {
+      handleMovement();
+      handleGravity();
+    }, 30);
+
+    handleCollisionWithDamageLayer();
+
+    return () => {
+      clearInterval(gameLoop);
+    };
+  }, [keysPressed, position]);
+
+  // Слушатели клавиш
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [keysPressed]);
 
   return (
     <div
@@ -193,9 +208,8 @@ const Mario = ({ mapData, tileSize, collisionData, initialPosition }) => {
         height: tileSize,
         backgroundImage: `url(${idleAnimationGif})`,
         backgroundSize: "contain",
-        backgroundPosition:'center',
+        backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        transition: "left 0.1s, top 0.1s",
       }}
     />
   );
