@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Mario from "../Mario/Mario";
+import Enemy from "../Enemy/Enemy"
 
 const BASE_URL = "http://localhost:5173/map/";
 
@@ -9,7 +10,13 @@ const MapRenderer = ({ mapFile }) => {
   const [collisionData, setCollisionData] = useState([]);
   const [ladderData, setLadderData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [initialPosition, setInitialPosition] = useState({ x: 0, y: 640 });
+  const [initialPosition, setInitialPosition] = useState({ x: 0, y: 640 }); //Начальная координата для 1 уровня
+
+  const [position, setPosition] = useState(initialPosition);
+
+
+
+  // Жизни
   const [lives, setLives] = useState(1);
   const [gameOver, setGameOver] = useState(false); // Флаг завершения игры
   const [timeElapsed, setTimeElapsed] = useState(0); // Время игры в секундах
@@ -19,10 +26,9 @@ const MapRenderer = ({ mapFile }) => {
   const start = { x: 0, y: 640 }; // Начальная точка
   const finish = { x: 1440, y: 63 }; // Конечная точка
 
-  // Функция для проверки достижения финиша
-
   // Функция проверки попадания на слой с повреждением
 
+  //Функция для отрисовки "Жизней" - слева сверху в углу
   const drawLives = () => {
     const heartIcon = "❤️";
     return (
@@ -43,6 +49,7 @@ const MapRenderer = ({ mapFile }) => {
     );
   };
 
+  //Как только запускается карта - запускается таймер
   useEffect(() => {
     startGame();
   }, []);
@@ -140,6 +147,7 @@ const MapRenderer = ({ mapFile }) => {
     loadTilesets();
   }, [mapData]);
 
+  //Если в данный момент количество жизней меньше 0, но игра еще не завершена - мы умираем и завершаем игру
   useEffect(() => {
     if (lives <= 0 && !gameOver) {
       setGameOver(true);
@@ -207,16 +215,25 @@ const MapRenderer = ({ mapFile }) => {
       );
   };
 
+  const handleIsEnemyAndPlayerCollision = () => {
+    setLives(lives => lives - 1);
+    if (lives <= 0) {
+     setGameOver(true);
+    }
+  }
+
   // Отображение сообщения о завершении игры
   if (gameOver) {
     return (
       <>
         <div>
+          {/*  Если жизней <0, то  GmaeOver, в ином случае - победа */}
           {lives <= 0
             ? "Game Over!"
             : "Вы победили!" + { timeElapsed } + " сек"}
         </div>
         <button onClick={() => window.location.reload()}>Еще раз?</button>
+        {/* Перезагрузка страницы при клике на кнопку еще раз */}
       </>
     );
   }
@@ -229,7 +246,9 @@ const MapRenderer = ({ mapFile }) => {
         height: mapData.height * mapData.tileheight,
       }}
     >
+      {/* Отрендерить все плитки карты */}
       {renderTileLayers()}
+      {/* Отрендерить сердечки */}
       {drawLives()}
       <div
         style={{
@@ -241,6 +260,11 @@ const MapRenderer = ({ mapFile }) => {
       >
         Time: {timeElapsed} seconds
       </div>
+      {/* Пропсы(Данные) Марио : Информация о карте, размеры плитки, и так далее*/}
+      <Enemy initialPosition={{x:500, y: 640}} distance={100} tileSize={mapData.tilewidth} playerPosition={position}
+      handleIsEnemyAndPlayerCollision={handleIsEnemyAndPlayerCollision}
+      
+      />
       <Mario
         mapData={mapData}
         tileSize={mapData.tilewidth}
@@ -251,6 +275,8 @@ const MapRenderer = ({ mapFile }) => {
         initialPosition={initialPosition}
         setGameOver={setGameOver}
         finish={finish}
+        position={position}
+        setPosition={setPosition}
       />
     </div>
   );

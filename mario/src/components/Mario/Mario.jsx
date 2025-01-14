@@ -11,10 +11,14 @@ const Mario = ({
   lives,
   setGameOver,
   finish,
+  position, setPosition
 }) => {
-  const [position, setPosition] = useState(initialPosition);
+  // Начальная позиция где спавнится перс (x, y)
+  // Проверка на прыжок (true , false)
   const [isJumping, setIsJumping] = useState(false);
+  // Скорость перемещения перса в виде состояния
   const [velocity, setVelocity] = useState(0);
+  // Объект где лежат нажатые клавышие в момент времени
   const [keysPressed, setKeysPressed] = useState(new Set());
 
   const gravity = 1.9; // Гравитация
@@ -22,13 +26,17 @@ const Mario = ({
   const speed = 16; // Скорость движения
   const ladderSpeed = 6; // Скорость движения по лестнице
 
+
+  // Находится ли перс на финише
   const checkIfPlayerReachedFinish = () => {
-    console.log(position.x, position.y);
+
     if (position.x >= finish.x && position.y >= finish.y) {
       setGameOver(true); // Игрок достиг финиша
       alert("Congratulations, you reached the finish!"); // Сообщение о победе
     }
   };
+  
+  // Функция проверки коллизии персонажа с слоем дамага
 
   const handleCollisionWithDamageLayer = () => {
     const damageLayerId = 122; // ID плитки повреждения
@@ -210,6 +218,7 @@ const Mario = ({
         backgroundSize: "contain",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        transition:".2s"
       }}
     />
   );
