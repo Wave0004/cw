@@ -8,7 +8,7 @@
 </template>
 
 <script>
-<!-- Импортируем компонент MapRenderer из файла -->
+// <!-- Импортируем компонент MapRenderer из файла -->
 import MapRenderer from "./components/MapRenderer.vue";
 
 export default {
