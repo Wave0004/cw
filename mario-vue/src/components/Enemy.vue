@@ -21,7 +21,7 @@
 </template>
 
 <script>
-/* Импорт необходимых функций из Vue */
+
 import { ref, reactive, onMounted, onUnmounted, watch } from "vue";
 /* Импорт текстуры врага */
 import enemyTexture from "/map/enemy.png";
@@ -41,7 +41,7 @@ export default {
     handleIsEnemyAndPlayerCollision: Function,
   },
   setup(props) {
-    /* Создание реактивного объекта для позиции врага */
+    /* Создание реактивного(изменяет состояния во времени ) объекта для позиции врага */
     const enemyPosition = reactive({ ...props.initialPosition });
     /* Направление движения врага: 1 (вперед) или -1 (назад) */
     const direction = ref(1);

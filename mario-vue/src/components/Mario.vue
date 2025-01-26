@@ -36,12 +36,11 @@ export default {
     setPosition: Function, //изменение позиции персонажа
   },
   setup(props, { emit }) {
-    // передаем emit как второй аргумент в setup
     // Начальная позиция
     const position = reactive({ ...props.initialPosition });
-    const velocity = ref(0);
-    const isJumping = ref(false);
-    const keysPressed = ref(new Set());
+    const velocity = ref(0); //скорость
+    const isJumping = ref(false); //Флаг прыжка
+    const keysPressed = ref(new Set()); //Нажатые клавиши
 
     const gravity = 2; //гравитация
     const jumpStrength = 11; //сила прыжка
@@ -61,6 +60,7 @@ export default {
     // Проверка коллизии с повреждениями
     const handleCollisionWithDamageLayer = () => {
       const damageLayerId = 122; //id плитки с шипами
+      //ищем слой с именем damage
       const damageLayer = props.mapData.layers.find(
         (layer) => layer.name === "damage"
       );
@@ -78,7 +78,8 @@ export default {
       }
     };
 
-    // Проверка лестницы
+    // Проверка находимся ли на лестнице
+    //вернет булевое значение
     const isOnLadder = (x, y) =>
       props.ladderData.some(
         (ladder) =>
@@ -89,6 +90,7 @@ export default {
       );
 
     // Проверка столкновений
+    //вернет булевое значение
     const checkCollision = (x, y) =>
       props.collisionData.some(
         (obj) =>
@@ -100,33 +102,40 @@ export default {
 
     // Обработчик клавиш
     const handleKeyDown = (e) => {
-      keysPressed.value.add(e.key);
-
+      keysPressed.value.add(e.key); //Когда клавиша нажимается она добавляется в множество keysPressed
+      
+      //Проверка на двойной прыжок, если перс не в состояния прыжка, то он прыгает
+      //двойной прыжок не произойдет
       if ((e.key === " " || e.key === "w") && !isJumping.value) {
         isJumping.value = true;
         velocity.value = -jumpStrength;
       }
     };
 
+    //Если клавиша перестает быть  нажатой она удаляется из множества нажатых коавиш
     const handleKeyUp = (e) => {
       keysPressed.value.delete(e.key);
     };
 
     // Движение
     const handleMovement = () => {
+      //сохраняем в переменные координаты персонажа
       let newX = position.x;
       let newY = position.y;
 
+      //движение влево-вправо в зависимости от нажатой клавиши
       if (keysPressed.value.has("a")) newX -= speed;
       if (keysPressed.value.has("d")) newX += speed;
 
+      //Проверяем находится ли персонаж на лестнице
       if (isOnLadder(position.x, position.y)) {
+        //в зависимости от нажатой клавиши перс двигается вверх или вниз
         if (keysPressed.value.has("w")) newY -= ladderSpeed;
         if (keysPressed.value.has("s")) newY += ladderSpeed;
-      } else {
+      } else { // в противном случае если он не на лестнице
         newY += velocity.value;
       }
-
+      //Тут проверка на то, если он не на лестнице, то мы должны его установить на ближайший слой с коллизией
       if (!isOnLadder(newX, newY)) {
         const platformBelow = props.collisionData.find(
           (obj) =>
@@ -141,9 +150,11 @@ export default {
           isJumping.value = false;
         }
 
-        checkIfPlayerReachedFinish();
+        checkIfPlayerReachedFinish(); // Проверяем достиг ли наш персонаж финиша
       }
-
+      
+      //Тут просто проеряем на наличие коллизии
+      //если ее нет, то обновляем координаты персонажа
       if (!checkCollision(newX, newY)) {
         position.x = newX;
         position.y = newY;
@@ -156,8 +167,9 @@ export default {
     // Гравитация
     const handleGravity = () => {
       let newY = position.y;
-      let newVelocity = velocity.value + gravity;
+      let newVelocity = velocity.value + gravity; //сумма вертикалной скорости и гравитации
 
+      //проверяем находится ли он на лестнице
       if (isOnLadder(position.x, position.y)) {
         if (keysPressed.value.has("w")) newY -= ladderSpeed;
         if (keysPressed.value.has("s")) newY += ladderSpeed;
@@ -165,11 +177,14 @@ export default {
       } else {
         newY += velocity.value;
       }
-
+      //Проверка на коллизию
+      //Если столкновение происходит: ерсонаж больше не находится в прыжке. и скорость сбрасываем чтобы остановить движение
       if (checkCollision(position.x, newY)) {
         isJumping.value = false;
         newVelocity = 0;
-
+        
+        //наодим куда ему приземлиться
+        //если такой объект найден то его координата y возвращается
         const groundY = props.collisionData.find(
           (obj) =>
             position.x + props.tileSize > obj.x &&
@@ -178,13 +193,13 @@ export default {
             newY + props.tileSize > obj.y
         )?.y;
 
-        if (groundY !== undefined) {
+        if (groundY !== undefined) { //если найдена такая платформа то коорректируем его позицию так чтобы он стоях прямо на ней
           newY = groundY - props.tileSize;
         }
       }
 
-      velocity.value = newVelocity;
-      position.y = newY;
+      velocity.value = newVelocity; // вертикальную скорость обновляем
+      position.y = newY; // и позицию по у
     };
 
     // Таймер для обновления движения и гравитации
