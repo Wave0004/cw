@@ -172,6 +172,11 @@ export default {
 
         mapData.value = data;
 
+        // Логирование всех слоев карты
+    mapData.value.layers.forEach((layer, index) => {
+      console.log(`Layer ${layer.name} (${index}):`, layer);
+    });
+
         const collisionLayer = data.layers.find(
           (layer) => layer.name.toLowerCase() === "collision"
         );

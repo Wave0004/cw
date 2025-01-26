@@ -18,22 +18,22 @@
 <script>
 import { ref, reactive, onMounted, watch } from "vue";
 
-// Здесь явно укажите путь к вашему GIF
-import idleAnimationGif from "/map/Goblin.gif"; // или другой путь, если необходимо
+//Путь до картинки персонажа
+import idleAnimationGif from "/map/Goblin.gif"; 
 
 export default {
   props: {
-    tileSize: Number,
-    collisionData: Array,
-    ladderData: Array,
-    mapData: Object,
-    finish: Object,
-    initialPosition: Object,
-    lives: Number,
-    setLives: Function,
-    setGameOver: Function,
-    position: Object,
-    setPosition: Function,
+    tileSize: Number, //размер тайла
+    collisionData: Array, //Данные о коллизии
+    ladderData: Array, //Данные о лестницах
+    mapData: Object, //Данные о карте
+    finish: Object, //Координаты финиша
+    initialPosition: Object, //нач позиция
+    lives: Number, //жизни
+    setLives: Function, //изменение жизней
+    setGameOver: Function, //завершение игры
+    position: Object, //позиция персонажа
+    setPosition: Function, //изменение позиции персонажа
   },
   setup(props, { emit }) {
     // передаем emit как второй аргумент в setup
@@ -43,12 +43,14 @@ export default {
     const isJumping = ref(false);
     const keysPressed = ref(new Set());
 
-    const gravity = 2;
-    const jumpStrength = 7;
-    const speed = 14;
-    const ladderSpeed = 6;
+    const gravity = 2; //гравитация
+    const jumpStrength = 11; //сила прыжка
+    const speed = 14; //скорость
+    const ladderSpeed = 6; //скорость на лестнице
 
     // Проверка на финиш
+    //Если координата х,y персонажа >= координате x,y финиша то устанавливаем флаг завершения игры в true
+    //Выводим сообщение о победе
     const checkIfPlayerReachedFinish = () => {
       if (position.x >= props.finish.x && position.y >= props.finish.y) {
         props.setGameOver(true);
@@ -58,7 +60,7 @@ export default {
 
     // Проверка коллизии с повреждениями
     const handleCollisionWithDamageLayer = () => {
-      const damageLayerId = 122;
+      const damageLayerId = 122; //id плитки с шипами
       const damageLayer = props.mapData.layers.find(
         (layer) => layer.name === "damage"
       );

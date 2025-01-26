@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import idleAnimationGif from "/map/Goblin.gif";
 
 const Mario = ({
-  tileSize,
+  tileSize, 
   collisionData,
   initialPosition,
   ladderData,
@@ -11,15 +11,18 @@ const Mario = ({
   lives,
   setGameOver,
   finish,
-  position, setPosition
+  position, setPosition,
+
 }) => {
-  // Начальная позиция где спавнится перс (x, y)
   // Проверка на прыжок (true , false)
   const [isJumping, setIsJumping] = useState(false);
   // Скорость перемещения перса в виде состояния
   const [velocity, setVelocity] = useState(0);
   // Объект где лежат нажатые клавышие в момент времени
   const [keysPressed, setKeysPressed] = useState(new Set());
+
+  const [collectedBonuses, setCollectedBonuses] = useState(new Set());
+  const [bonusCount, setBonusCount] = useState(0);
 
   const gravity = 1.9; // Гравитация
   const jumpStrength = 14; // Сила прыжка
@@ -60,31 +63,55 @@ const Mario = ({
     }
   };
 
+  const handleCollisionWithBonusTile = () => {
+    const bonusTileId = 580; // ID плитки бонуса
+    const mainLayer = mapData.layers.find((layer) => layer.name === "main");
+
+    if (mainLayer) {
+      const xIndex = Math.floor(position.x / tileSize);
+      const yIndex = Math.floor(position.y / tileSize);
+      const index = yIndex * mainLayer.width + xIndex;
+
+      const isOnBonusTile = mainLayer.data[index] === bonusTileId;
+
+      if (isOnBonusTile && !collectedBonuses.has(index)) {
+        setCollectedBonuses((prev) => new Set(prev).add(index));
+        setBonusCount(bonusCount + 1);
+        alert("Вы получили бонус!");
+      }
+    }
+  };
+
+
   // Проверка нахождения на лестнице
+  //Принимает две кординаты персонажа 
   const isOnLadder = (x, y) =>
-    ladderData.some(
-      (ladder) =>
+    ladderData.some( //Перебираем все элементы в ladderData и проверяем
+      (ladder) => //попадает ли персонаж в лестницу
         x + tileSize > ladder.x &&
         x < ladder.x + ladder.width &&
         y + tileSize > ladder.y &&
         y < ladder.y + ladder.height
     );
 
-  // Проверка столкновений
+  // Проверка столкновений, принимает две координаты персонажа
   const checkCollision = (x, y) =>
-    collisionData.some(
+    collisionData.some( //Проходимся по массиву с коллизиями и проверяем
       (obj) =>
-        x < obj.x + obj.width &&
-        x + tileSize > obj.x &&
-        y < obj.y + obj.height &&
-        y + tileSize > obj.y
+        x < obj.x + obj.width && //не находится ли справа персонаж
+        x + tileSize > obj.x && //не выходлит ли за левую границу 
+        y < obj.y + obj.height && //не находится ли выше границы
+        y + tileSize > obj.y // не находится ли верхняя позиция перса ниже
     );
 
   // Обработчик нажатия клавиш
   const handleKeyDown = (e) => {
+    //Храним все клавиши, которые нажимали, как только нажали клавишу
+    //она добавляется в список
     setKeysPressed((prev) => new Set(prev).add(e.key));
 
-    // Прыжок
+    // проверка на Прыжок(двойной)
+    //Если персонаж уже прыгает, то не выполнится прыжок еще раз
     if ((e.key === " " || e.key === "w") && !isJumping) {
       setIsJumping(true);
       setVelocity(-jumpStrength);
@@ -93,23 +120,27 @@ const Mario = ({
 
   // Обработчик отпускания клавиш
   const handleKeyUp = (e) => {
+    //prev - значение состояния до того как мы начали менять
     setKeysPressed((prev) => {
-      const updated = new Set(prev);
-      updated.delete(e.key);
-      return updated;
+      const updated = new Set(prev); //Создаем новый набор клавиш на основе старого
+      updated.delete(e.key); //Удаляем клавишу из набора так как ее отпустили
+      return updated; // Возвращаем новый набор
     });
   };
 
   // Движение персонажа
   const handleMovement = () => {
+    //Сохраняем текущие координаты перса
     let newX = position.x;
     let newY = position.y;
 
     // Движение влево и вправо
-    if (keysPressed.has("a")) newX -= speed;
-    if (keysPressed.has("d")) newX += speed;
+    if (keysPressed.has("a")) newX -= speed; //Если нажали a, то передвигаемся влево
+    if (keysPressed.has("d")) newX += speed; // Если нажали d, то передвигаемся вправо
 
     // Движение по лестнице
+    //Проверяем если персонаж находится на лестнице
+    //аналогично движению влево и вправо
     if (isOnLadder(position.x, position.y)) {
       if (keysPressed.has("w")) newY -= ladderSpeed; // Подъем
       if (keysPressed.has("s")) newY += ladderSpeed; // Спуск
@@ -121,6 +152,7 @@ const Mario = ({
     // Проверка выхода с лестницы
     if (!isOnLadder(newX, newY)) {
       // Убедиться, что персонаж стоит на платформе
+      //Если персонаж не на лестнице, то в collisionData проверяем где он стоит
       const platformBelow = collisionData.find(
         (obj) =>
           newX + tileSize > obj.x &&
@@ -134,10 +166,12 @@ const Mario = ({
         setIsJumping(false);
       }
 
-      checkIfPlayerReachedFinish();
+      checkIfPlayerReachedFinish(); // Проверяем не достиг ли наш персонаж финиша
     }
 
     // Проверка на столкновения
+    //Если столкновений нет, то обновляем позицию персонажа
+    //таким образом он может перемещаться на экране
     if (!checkCollision(newX, newY)) {
       setPosition({ x: newX, y: newY });
     }
@@ -146,7 +180,7 @@ const Mario = ({
   // Гравитация и прыжки
   const handleGravity = () => {
     let newY = position.y;
-    let newVelocity = velocity + gravity;
+    let newVelocity = velocity + gravity; // Скорость перемещения задаем как сумму вертикальной скорости и гравитации
 
     // Если не на лестнице, то применяется гравитация
     if (isOnLadder(position.x, position.y)) {
@@ -158,11 +192,12 @@ const Mario = ({
     }
 
     // Проверка столкновений с землей
+    //Если столкновение есть, например с землей, то jump в ноль и скорость по Y   в ноль
     if (checkCollision(position.x, newY)) {
       setIsJumping(false);
       newVelocity = 0;
 
-      // Найти ближайший пол
+      // Найти ближайший пол, с которым персонаж может столкнуться при падении
       const groundY = collisionData.find(
         (obj) =>
           position.x + tileSize > obj.x &&
@@ -171,13 +206,15 @@ const Mario = ({
           newY + tileSize > obj.y
       )?.y;
 
+      //Если мы нашли платформу, на которую преземлился перс, то устанавливаем
+      //его координату на ней
       if (groundY !== undefined) {
         newY = groundY - tileSize;
       }
     }
 
-    setVelocity(newVelocity);
-    setPosition((prev) => ({ ...prev, y: newY }));
+    setVelocity(newVelocity); //Устанавоиваем новую вертикальную скорость
+    setPosition((prev) => ({ ...prev, y: newY })); //меняем позицию персонажа
   };
 
   // Таймеры для движения и гравитации
@@ -189,6 +226,7 @@ const Mario = ({
     }, 30);
 
     handleCollisionWithDamageLayer();
+    handleCollisionWithBonusTile();
 
     return () => {
       clearInterval(gameLoop);
@@ -207,7 +245,8 @@ const Mario = ({
   }, [keysPressed]);
 
   return (
-    <div
+
+    <div //Здесь рендерится перс
       style={{
         position: "absolute",
         left: position.x,

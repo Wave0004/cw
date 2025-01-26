@@ -5,19 +5,19 @@ import Enemy from "../Enemy/Enemy"
 const BASE_URL = "http://localhost:5173/map/";
 
 const MapRenderer = ({ mapFile }) => {
-  const [mapData, setMapData] = useState(null);
-  const [tilesets, setTilesets] = useState([]);
-  const [collisionData, setCollisionData] = useState([]);
-  const [ladderData, setLadderData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [mapData, setMapData] = useState(null); //Храним данные о карте
+  const [tilesets, setTilesets] = useState([]); //Список тайлсетов
+  const [collisionData, setCollisionData] = useState([]); //Данные о коллизии
+  const [ladderData, setLadderData] = useState([]); //Данные о лестницах
+  const [loading, setLoading] = useState(true); //Флаг загрузки данных
   const [initialPosition, setInitialPosition] = useState({ x: 0, y: 640 }); //Начальная координата для 1 уровня
 
-  const [position, setPosition] = useState(initialPosition);
+  const [position, setPosition] = useState(initialPosition); //Текущая позиция игрока
 
 
 
   // Жизни
-  const [lives, setLives] = useState(1);
+  const [lives, setLives] = useState(1); //количество жизней персонажа
   const [gameOver, setGameOver] = useState(false); // Флаг завершения игры
   const [timeElapsed, setTimeElapsed] = useState(0); // Время игры в секундах
   const [timerStarted, setTimerStarted] = useState(false); // Флаг для начала таймера
@@ -49,45 +49,59 @@ const MapRenderer = ({ mapFile }) => {
     );
   };
 
+
+
+
+
+
   //Как только запускается карта - запускается таймер
+  //хук запускающий игру
   useEffect(() => {
     startGame();
   }, []);
 
+  //Хук загрузки данных о карте
   useEffect(() => {
     const loadMapData = async () => {
       const tileSize = 32; // Определите размер тайла (в пикселях)
 
       try {
+        //загружаем json-файл карты
         const response = await fetch(mapFile);
-        if (!response.ok)
+        if (!response.ok) //Обработка ошибки загрузки карты
           throw new Error(`Failed to load map: ${response.statusText}`);
-        const data = await response.json();
+        const data = await response.json(); //Парсим json-файл карты
 
-        setMapData(data);
+        setMapData(data); //Сохраняем данные карты в состояние
 
         // Слой коллизий
+        //Проходимся по слоям карты и ищем с именем "collision"
         const collisionLayer = data.layers.find(
           (layer) => layer.name.toLowerCase() === "collision"
         );
-        setCollisionData(collisionLayer?.objects || []);
+        setCollisionData(collisionLayer?.objects || []); //Сохраняем данные о коллизии
 
         // Слой лестниц
+        //Проходимся по слоям карты и ищем с именем "ladder"
         const ladderLayer = data.layers.find(
           (layer) => layer.name.toLowerCase() === "ladder"
         );
 
+        //Проверяем, существует ли слой с лестницами и соответствует ли тип tilelayer
         if (ladderLayer && ladderLayer.type === "tilelayer") {
-          const { data: layerData, width, height } = ladderLayer;
-          const processedLadderData = [];
+          const { data: layerData, width, height } = ladderLayer; //Распаковывае свойства объекта
+          //Массив с идентификатором тайлов на слое, ширина слоя, высота слоя
+          const processedLadderData = []; //Массив для данных о найденных лестницах (их координаты и размеры)
 
+          //Проходимся по всем слоям
           for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-              const index = y * width + x;
-              const tileId = layerData[index];
+              const index = y * width + x; //Вычисляем индекс текущей клетки
+              const tileId = layerData[index]; //Извлекаем идентификатор тайла из массива по текущему индексу 
 
+              //Тут проверяем, если tileId !=0 значит это лестница
               if (tileId !== 0) {
-                processedLadderData.push({
+                processedLadderData.push({ //добавляем в массив информацию о лестницах
                   x: x * tileSize, // Координата X лестницы в пикселях
                   y: y * tileSize, // Координата Y лестницы в пикселях
                   width: tileSize, // Ширина тайла
@@ -97,12 +111,12 @@ const MapRenderer = ({ mapFile }) => {
             }
           }
 
-          setLadderData(processedLadderData);
+          setLadderData(processedLadderData); //После обработки всех клеток сохраним массив с данными о лестницах
         }
-      } catch (error) {
+      } catch (error) { //В случае ошибки рендеринга карты - выведем ошибку в консоль
         console.error("Error loading map:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); //Убираем флаг загрузки
       }
     };
 
@@ -112,39 +126,45 @@ const MapRenderer = ({ mapFile }) => {
   useEffect(() => {
     if (!mapData) return;
 
+
+      //Функция для загрузки тайлсетов
     const loadTilesets = async () => {
       try {
+        //Перебираем массив тайлсетов и создаем для каждого из них ассинхронный запрос
         const tilesetPromises = mapData.tilesets.map(async (tileset) => {
+          //отправляем запрос  для получения данных о тайлсете
           const response = await fetch(`${BASE_URL}${tileset.source}`);
-          if (!response.ok)
+          if (!response.ok) //Если ответ неуспешный - выкинем ошибку
             throw new Error(`Failed to load tileset: ${response.statusText}`);
 
+            //Получаем данные из ответа
           const xmlText = await response.text();
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-
+          
+          //ищем в xml документе image
           const imageElement = xmlDoc.querySelector("image");
           return {
-            name: tileset.source,
-            image: `${BASE_URL}${imageElement?.getAttribute("source")}`,
-            tilewidth: parseInt(
+            name: tileset.source, //получаем имя тайлсета
+            image: `${BASE_URL}${imageElement?.getAttribute("source")}`, //путь к изображению
+            tilewidth: parseInt( //размеры одного тайла в пикселях
               xmlDoc.documentElement.getAttribute("tilewidth")
             ),
             tileheight: parseInt(
               xmlDoc.documentElement.getAttribute("tileheight")
             ),
-            columns: parseInt(xmlDoc.documentElement.getAttribute("columns")),
+            columns: parseInt(xmlDoc.documentElement.getAttribute("columns")), //количество тайлов(колонок) в изображении
           };
         });
-
+        //ждем завершения загрузки всех тайлсетов, используем promise.all для обработки массива промисов
         const tilesetData = await Promise.all(tilesetPromises);
         setTilesets(tilesetData);
-      } catch (error) {
+      } catch (error) { //В случае ошибки - выведем в консоль
         console.error("Error loading tilesets:", error);
       }
     };
 
-    loadTilesets();
+    loadTilesets(); //Вызываем функцию загрузки тайлсетов
   }, [mapData]);
 
   //Если в данный момент количество жизней меньше 0, но игра еще не завершена - мы умираем и завершаем игру
@@ -172,14 +192,15 @@ const MapRenderer = ({ mapFile }) => {
   if (loading || !mapData || tilesets.length === 0)
     return <div>Loading...</div>;
 
+  //Проходимся по всем слоям
   const renderTileLayers = () => {
     return mapData.layers
-      .filter((layer) => layer.data)
+      .filter((layer) => layer.data) // фильтруем слои у которых есть данные из layer.data
       .map((layer, layerIndex) =>
         layer.data.map((tileId, index) => {
-          if (tileId === 0) return null;
+          if (tileId === 0) return null; // Пропускаем клетки с tileId = 0 тк они пустые
 
-          const tileset = tilesets.find(
+          const tileset = tilesets.find( //находим из какого тайлсета пришел текущий тайл
             (_, i) =>
               tileId >= mapData.tilesets[i].firstgid &&
               (!mapData.tilesets[i + 1] ||
@@ -187,17 +208,19 @@ const MapRenderer = ({ mapFile }) => {
           );
           if (!tileset) return null;
 
+          //Вычисляем индекс тайла в изображении  тайлсета
           const tileIndex =
             tileId - mapData.tilesets[tilesets.indexOf(tileset)].firstgid;
-          const sourceX = (tileIndex % tileset.columns) * tileset.tilewidth;
+          //Определяем координаты тайла в изображении
+            const sourceX = (tileIndex % tileset.columns) * tileset.tilewidth;
           const sourceY =
             Math.floor(tileIndex / tileset.columns) * tileset.tileheight;
-
+            //Вычисляем координаты для открисовки тайла на экране
           const x = (index % layer.width) * mapData.tilewidth;
           const y = Math.floor(index / layer.width) * mapData.tileheight;
 
           return (
-            <div
+            <div //div, который представляет собой текущий тайл
               key={`${layerIndex}-${index}`}
               style={{
                 position: "absolute",
@@ -215,6 +238,7 @@ const MapRenderer = ({ mapFile }) => {
       );
   };
 
+    //Функция  столкновения с врагом
   const handleIsEnemyAndPlayerCollision = () => {
     setLives(lives => lives - 1);
     if (lives <= 0) {
