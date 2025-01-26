@@ -30,14 +30,30 @@ const Mario = ({
   const ladderSpeed = 6; // Скорость движения по лестнице
 
 
-  // Находится ли перс на финише
-  const checkIfPlayerReachedFinish = () => {
+  // // Находится ли перс на финише
+  // const checkIfPlayerReachedFinish = () => {
 
-    if (position.x >= finish.x && position.y >= finish.y) {
-      setGameOver(true); // Игрок достиг финиша
+  //   if (position.x >= finish.x && position.y >= finish.y) {
+  //     setGameOver(true); // Игрок достиг финиша
+  //     alert("Congratulations, you reached the finish!"); // Сообщение о победе
+  //   }
+  // };
+
+  //проверка на то достиг ли персонаж финишаы
+  const checkIfPlayerReachedFinish = () => {
+    // Учитываем размер тайла для проверки попадания в область финиша
+    const isInFinishArea =
+      position.x + tileSize > finish.x && // Правая граница персонажа пересекла финиш
+      position.x < finish.x + tileSize && // Левая граница персонажа находится в пределах финиша
+      position.y + tileSize > finish.y && // Нижняя граница персонажа пересекла финиш
+      position.y < finish.y + tileSize; // Верхняя граница персонажа находится в пределах финиша
+  
+    if (isInFinishArea) {
+      setGameOver(true); // Устанавливаем флаг завершения игры
       alert("Congratulations, you reached the finish!"); // Сообщение о победе
     }
   };
+  
   
   // Функция проверки коллизии персонажа с слоем дамага
 
